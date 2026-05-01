@@ -1,0 +1,60 @@
+body {
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+  margin: 0;
+  text-align: center;
+}
+
+.container {
+  padding: 40px;
+}
+
+/* CARD FIX */
+.card {
+  background: #1e293b;
+  padding: 20px;
+  margin: 20px auto;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+/* DROP ZONE FIX */
+.drop-zone {
+  width: 100%;
+  padding: 25px;
+  border: 2px dashed #38bdf8;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #1e293b;
+  box-sizing: border-box;
+  margin-bottom: 15px;
+}
+
+/* SMALL DROP ZONE */
+.drop-zone.small {
+  padding: 20px;
+}
+
+/* BUTTON */
+button {
+  margin-top: 10px;
+  padding: 10px 15px;
+  border: none;
+  background: #38bdf8;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button:hover {
+  background: #0ea5e9;
+}
+
+/* PAGE LIST */
+label {
+  font-size: 14px;
+}

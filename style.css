@@ -1,3 +1,4 @@
+/* RESET */
 * {
   margin: 0;
   padding: 0;
@@ -5,6 +6,7 @@
   font-family: system-ui, sans-serif;
 }
 
+/* BODY */
 body {
   background: #0f172a;
   color: white;
@@ -24,6 +26,7 @@ body {
   font-size: 18px;
 }
 
+/* NAV BUTTONS */
 .tabs button {
   background: #1f2937;
   border: none;
@@ -38,7 +41,7 @@ body {
   background: #334155;
 }
 
-/* MAIN */
+/* MAIN CONTAINER */
 .container {
   height: calc(100vh - 60px);
 }
@@ -47,75 +50,4 @@ iframe {
   width: 100%;
   height: 100%;
   border: none;
-}
-
-/* DROP ZONE */
-.dropzone {
-  border: 2px dashed #334155;
-  padding: 20px;
-  text-align: center;
-  border-radius: 12px;
-  background: #111827;
-  transition: 0.2s;
-}
-
-.dropzone.active {
-  background: #1e293b;
-  border-color: #60a5fa;
-}
-
-/* FILE LIST */
-.file {
-  background: #1f2937;
-  padding: 8px;
-  margin-top: 6px;
-  border-radius: 8px;
-  font-size: 13px;
-}
-
-.muted {
-  opacity: 0.6;
-}
-
-/* PAGE CARDS */
-.page {
-  background: #1f2937;
-  margin: 10px 0;
-  padding: 10px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.page:hover {
-  transform: scale(1.01);
-}
-
-.page.selected {
-  border: 2px solid #60a5fa;
-}
-
-.canvasWrap canvas {
-  width: 100%;
-  border-radius: 8px;
-}
-
-.pageLabel {
-  font-size: 12px;
-  margin-top: 6px;
-  opacity: 0.7;
-}
-
-/* PROGRESS */
-.progress {
-  height: 6px;
-  background: #334155;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.progress div {
-  height: 100%;
-  width: 0%;
-  background: #60a5fa;
 }

@@ -1,19 +1,13 @@
 window.openTab = function(tab) {
   const view = document.getElementById("view");
 
-  if (!view) return;
+  const routes = {
+    merge: "function/merge.html",
+    split: "function/split.html",
+    sign: "function/sign.html"
+  };
 
-  if (tab === "merge") {
-    view.src = "function/merge.html";
-  }
-
-  if (tab === "split") {
-    view.src = "function/split.html";
-  }
-
-  if (tab === "sign") {
-    view.src = "function/sign.html";
-  }
+  view.src = routes[tab];
 };
 
 function download(bytes, name) {
@@ -27,3 +21,4 @@ function download(bytes, name) {
 
   URL.revokeObjectURL(url);
 }
+

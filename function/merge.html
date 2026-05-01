@@ -12,6 +12,20 @@ body {
   padding: 20px;
 }
 
+.file {
+  background: #111827;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 8px;
+  cursor: grab;
+  display: flex;
+  justify-content: space-between;
+}
+
+.file.dragging {
+  opacity: 0.5;
+}
+
 .dropzone {
   border: 2px dashed #475569;
   padding: 30px;
@@ -90,13 +104,59 @@ function add(fileList) {
 
 function render() {
   list.innerHTML = "";
+
   files.forEach((f, i) => {
     const div = document.createElement("div");
     div.className = "file";
+    div.draggable = true;
+    div.dataset.index = i;
+
     div.innerHTML = `${f.name} <button onclick="remove(${i})">X</button>`;
+
+    // drag start
+    div.ondragstart = () => {
+      div.classList.add("dragging");
+    };
+
+    div.ondragend = () => {
+      div.classList.remove("dragging");
+    };
+
     list.appendChild(div);
   });
 }
+
+// container drag reorder
+list.ondragover = (e) => {
+  e.preventDefault();
+
+  const dragging = document.querySelector(".dragging");
+  const afterElement = getDragAfterElement(list, e.clientY);
+
+  if (afterElement == null) {
+    list.appendChild(dragging);
+  } else {
+    list.insertBefore(dragging, afterElement);
+  }
+};
+
+function getDragAfterElement(container, y) {
+  const elements = [...container.querySelectorAll(".file:not(.dragging)")];
+
+  return elements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    } else {
+      return closest;
+    }
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+
+
 
 function remove(i) {
   files.splice(i, 1);

@@ -36,6 +36,19 @@ button {
 
 <br>
 <button onclick="clearCanvas()">Clear</button>
+<button onclick="exportPDF()">Export Signed PDF</button>
+
+
+
+
+
+
+
+
+
+
+
+
 
 <script>
 const canvas = document.getElementById("canvas");
@@ -57,6 +70,35 @@ canvas.onmousemove = (e) => {
 
 function clearCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+
+async function exportPDF() {
+  const { PDFDocument } = PDFLib;
+
+  const pdf = await PDFDocument.create();
+
+  const page = pdf.addPage([600, 300]);
+
+  const img = canvas.toDataURL("image/png");
+  const pngImage = await pdf.embedPng(img);
+
+  page.drawImage(pngImage, {
+    x: 50,
+    y: 50,
+    width: 200,
+    height: 100
+  });
+
+  const bytes = await pdf.save();
+
+  const blob = new Blob([bytes], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "signed.pdf";
+  a.click();
 }
 </script>
 

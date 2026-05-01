@@ -1,33 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SahilPDF Studio</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sahil-FileForge</title>
 
-  <link rel="stylesheet" href="style.css?v=2">
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  background: #0b1220;
+  color: #e5e7eb;
+}
+
+/* TOP BAR */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: rgba(17, 24, 39, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #1f2937;
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* DASHBOARD GRID */
+.dashboard {
+  padding: 30px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+/* TOOL CARDS */
+.card {
+  background: linear-gradient(145deg, #111827, #0f172a);
+  border: 1px solid #1f2937;
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  transition: 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  border-color: #3b82f6;
+  box-shadow: 0 10px 30px rgba(59,130,246,0.15);
+}
+
+/* ICON */
+.icon {
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+
+/* TITLE */
+.title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* DESCRIPTION */
+.desc {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-top: 6px;
+}
+
+/* IFRAME AREA */
+.container {
+  height: calc(100vh - 70px);
+}
+
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* BACK BUTTON INSIDE TOOL */
+.back {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #1f2937;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.home-btn {
+  background: #1f2937;
+  color: white;
+  border: 1px solid #374151;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.home-btn:hover {
+  background: #334155;
+  border-color: #3b82f6;
+}
+</style>
 </head>
 
 <body>
 
-  <div class="topbar">
-    <h1>📄 SahilPDF Studio</h1>
+<div class="topbar">
+  <div class="logo">Sahil-FileForge</div>
 
-    <div class="tabs">
-      <button onclick="openTab('merge')">Merge</button>
-      <button onclick="openTab('split')">Split</button>
-      <button onclick="openTab('sign')">Sign</button>
-    </div>
+  <button class="home-btn" onclick="goHome()">🏠 Home</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="home" class="dashboard">
+
+  <div class="card" onclick="openTab('merge')">
+    <div class="icon">🔗</div>
+    <div class="title">Merge PDF</div>
+    <div class="desc">Combine multiple PDFs into one file</div>
   </div>
 
-  <!-- MAIN VIEW -->
-  <div class="container">
-
-    <iframe id="view" src="functions/merge.html"></iframe>
-
+  <div class="card" onclick="openTab('split')">
+    <div class="icon">✂️</div>
+    <div class="title">Split PDF</div>
+    <div class="desc">Extract pages from your PDF</div>
   </div>
 
-  <script src="app.js"></script>
+  <div class="card" onclick="openTab('sign')">
+    <div class="icon">✍️</div>
+    <div class="title">Sign PDF</div>
+    <div class="desc">Add digital signature to documents</div>
+  </div>
+
+</div>
+
+<!-- APP VIEW -->
+<div class="container">
+  <iframe id="view" style="display:none"></iframe>
+</div>
+
+<script>
+function openTab(tab) {
+  document.getElementById("home").style.display = "none";
+
+  const view = document.getElementById("view");
+  view.style.display = "block";
+
+  const routes = {
+    merge: "function/merge.html",
+    split: "function/split.html",
+    sign: "function/sign.html"
+  };
+
+  view.src = routes[tab];
+}
+function goHome() {
+  document.getElementById("home").style.display = "grid";
+
+  const view = document.getElementById("view");
+  view.style.display = "none";
+  view.src = "";
+}
+</script>
 
 </body>
 </html>

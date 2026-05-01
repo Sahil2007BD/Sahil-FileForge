@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Merge PDFs</title>
+
+<style>
+body {
+  font-family: system-ui;
+  background: #0f172a;
+  color: white;
+  padding: 20px;
+}
+
+.dropzone {
+  border: 2px dashed #475569;
+  padding: 30px;
+  text-align: center;
+  border-radius: 12px;
+  cursor: pointer;
+  background: #0b1220;
+}
+
+.dropzone.active {
+  border-color: #38bdf8;
+}
+
+.file {
+  background: #111827;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Merge PDFs</h2>
+
+<div id="drop" class="dropzone">
+  Drop PDFs or Click
+  <input type="file" id="input" multiple hidden accept="application/pdf">
+</div>
+
+<div id="list"></div>
+
+<button onclick="merge()">Merge</button>
+
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+
+<script>
+let files = [];
+
+const drop = document.getElementById("drop");
+const input = document.getElementById("input");
+const list = document.getElementById("list");
+
+drop.onclick = () => input.click();
+
+drop.ondragover = e => {
+  e.preventDefault();
+  drop.classList.add("active");
+};
+
+drop.ondragleave = () => drop.classList.remove("active");
+
+drop.ondrop = e => {
+  e.preventDefault();
+  add(e.dataTransfer.files);
+};
+
+input.onchange = e => add(e.target.files);
+
+function add(fileList) {
+  [...fileList].forEach(f => files.push(f));
+  render();
+}
+
+function render() {
+  list.innerHTML = "";
+  files.forEach((f, i) => {
+    const div = document.createElement("div");
+    div.className = "file";
+    div.innerHTML = `${f.name} <button onclick="remove(${i})">X</button>`;
+    list.appendChild(div);
+  });
+}
+
+function remove(i) {
+  files.splice(i, 1);
+  render();
+}
+
+async function merge() {
+  if (files.length < 2) return alert("Add at least 2 PDFs");
+
+  const pdf = await PDFLib.PDFDocument.create();
+
+  for (let f of files) {
+    const buf = await f.arrayBuffer();
+    const doc = await PDFLib.PDFDocument.load(buf);
+
+    const pages = await pdf.copyPages(doc, doc.getPageIndices());
+    pages.forEach(p => pdf.addPage(p));
+  }
+
+  const bytes = await pdf.save();
+
+  const blob = new Blob([bytes], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "merged.pdf";
+  a.click();
+}
+</script>
+
+</body>
+</html>

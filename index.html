@@ -4,43 +4,30 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SahilPDF Studio</title>
-  <link rel="stylesheet" href="style.css"/>
-  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
+
 <body>
 
-  <div class="container">
+  <div class="topbar">
     <h1>📄 SahilPDF Studio</h1>
-    <p>Fast Browser PDF Tool</p>
 
-    <!-- MERGE -->
- 
-    <div class="card">
-      <h2>Merge PDFs</h2>
-         <div id="mergeDropZone" class="drop-zone">
-      <p>📂 Drag & Drop PDFs for MERGE or click to upload</p>
-      <input type="file" id="mergeFiles" multiple hidden accept="application/pdf" />
+    <div class="tabs">
+      <button onclick="openTab('merge')">Merge</button>
+      <button onclick="openTab('split')">Split</button>
+      <button onclick="openTab('sign')">Sign</button>
     </div>
+  </div>
 
-      <button onclick="mergePDFs()">Merge</button>
-    </div>
+  <!-- MAIN VIEW -->
+  <div class="container">
 
-    <!-- SPLIT -->
-    <div class="card">
-      <h2>Split PDF (Select Pages)</h2>
-
-      <div id="splitDropZone" class="drop-zone small">
-        <p>📂 Drag & Drop PDF for SPLIT or click</p>
-        <input type="file" id="splitFile" hidden accept="application/pdf" />
-      </div>
-
-      <div id="pageList"></div>
-
-      <button onclick="splitPDF()">Split Selected Pages</button>
-    </div>
+    <iframe id="view" src="functions/merge.html"></iframe>
 
   </div>
 
   <script src="app.js"></script>
+
 </body>
-</html
+</html>

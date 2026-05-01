@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sign PDF</title>
+
+<style>
+body {
+  font-family: system-ui;
+  background: #0f172a;
+  color: white;
+  padding: 20px;
+}
+
+canvas {
+  background: white;
+  border-radius: 8px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Sign PDF (basic)</h2>
+
+<canvas id="canvas" width="400" height="200"></canvas>
+
+<br>
+<button onclick="clearCanvas()">Clear</button>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let drawing = false;
+
+canvas.onmousedown = () => drawing = true;
+canvas.onmouseup = () => drawing = false;
+
+canvas.onmousemove = (e) => {
+  if (!drawing) return;
+
+  const rect = canvas.getBoundingClientRect();
+
+  ctx.fillStyle = "black";
+  ctx.fillRect(e.clientX - rect.left, e.clientY - rect.top, 2, 2);
+};
+
+function clearCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+</script>
+
+</body>
+</html>

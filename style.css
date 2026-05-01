@@ -1,60 +1,121 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
 body {
-  font-family: Arial;
   background: #0f172a;
   color: white;
-  margin: 0;
-  text-align: center;
 }
 
-.container {
-  padding: 40px;
+/* TOP BAR */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: #111827;
+  border-bottom: 1px solid #1f2937;
 }
 
-/* CARD FIX */
-.card {
-  background: #1e293b;
-  padding: 20px;
-  margin: 20px auto;
-  width: 100%;
-  max-width: 400px;
-  border-radius: 12px;
-  box-sizing: border-box;
+.topbar h1 {
+  font-size: 18px;
 }
 
-/* DROP ZONE FIX */
-.drop-zone {
-  width: 100%;
-  padding: 25px;
-  border: 2px dashed #38bdf8;
-  border-radius: 10px;
-  cursor: pointer;
-  background: #1e293b;
-  box-sizing: border-box;
-  margin-bottom: 15px;
-}
-
-/* SMALL DROP ZONE */
-.drop-zone.small {
-  padding: 20px;
-}
-
-/* BUTTON */
-button {
-  margin-top: 10px;
-  padding: 10px 15px;
+.tabs button {
+  background: #1f2937;
   border: none;
-  background: #38bdf8;
-  color: black;
-  font-weight: bold;
+  color: white;
+  padding: 8px 12px;
+  margin-left: 8px;
+  border-radius: 8px;
   cursor: pointer;
-  border-radius: 5px;
 }
 
-button:hover {
-  background: #0ea5e9;
+.tabs button:hover {
+  background: #334155;
 }
 
-/* PAGE LIST */
-label {
-  font-size: 14px;
+/* MAIN */
+.container {
+  height: calc(100vh - 60px);
+}
+
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* DROP ZONE */
+.dropzone {
+  border: 2px dashed #334155;
+  padding: 20px;
+  text-align: center;
+  border-radius: 12px;
+  background: #111827;
+  transition: 0.2s;
+}
+
+.dropzone.active {
+  background: #1e293b;
+  border-color: #60a5fa;
+}
+
+/* FILE LIST */
+.file {
+  background: #1f2937;
+  padding: 8px;
+  margin-top: 6px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.muted {
+  opacity: 0.6;
+}
+
+/* PAGE CARDS */
+.page {
+  background: #1f2937;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.page:hover {
+  transform: scale(1.01);
+}
+
+.page.selected {
+  border: 2px solid #60a5fa;
+}
+
+.canvasWrap canvas {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.pageLabel {
+  font-size: 12px;
+  margin-top: 6px;
+  opacity: 0.7;
+}
+
+/* PROGRESS */
+.progress {
+  height: 6px;
+  background: #334155;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress div {
+  height: 100%;
+  width: 0%;
+  background: #60a5fa;
 }

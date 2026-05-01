@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Split PDF</title>
+
+<style>
+body {
+  font-family: system-ui;
+  background: #0f172a;
+  color: white;
+  padding: 20px;
+}
+
+.dropzone {
+  border: 2px dashed #475569;
+  padding: 30px;
+  text-align: center;
+  border-radius: 12px;
+  cursor: pointer;
+  background: #0b1220;
+}
+
+.page {
+  background: #111827;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.page.selected {
+  border: 2px solid #38bdf8;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Split PDF</h2>
+
+<div id="drop" class="dropzone">
+  Drop PDF or Click
+  <input type="file" id="input" hidden>
+</div>
+
+<div id="pages"></div>
+
+<button onclick="split()">Split Selected</button>
+
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<script>
+let doc;
+let pdfjs;
+let selected = [];
+
+const drop = document.getElementById("drop");
+const input = document.getElementById("input");
+const pages = document.getElementById("pages");
+
+drop.onclick = () => input.click();
+
+input.onchange = e => load(e.target.files[0]);
+
+async function load(file) {
+  const buf = await file.arrayBuffer();
+
+  doc = await PDFLib.PDFDocument.load(buf);
+  pdfjs = await pdfjsLib.getDocument({ data: buf }).promise;
+
+  render();
+}
+
+async function render() {
+  pages.innerHTML = "";
+
+  for (let i = 1; i <= pdfjs.numPages; i++) {
+    const page = await pdfjs.getPage(i);
+
+    const viewport = page.getViewport({ scale: 0.3 }); // thumbnail scale
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+
+    await page.render({
+      canvasContext: ctx,
+      viewport
+    }).promise;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "page";
+
+    wrapper.innerHTML = `
+      <div></div>
+      <small>Page ${i}</small>
+    `;
+
+    wrapper.querySelector("div").appendChild(canvas);
+
+    wrapper.onclick = () => wrapper.classList.toggle("selected");
+
+    pages.appendChild(wrapper);
+  }
+}
+
+async function split() {
+  const selectedPages = [...document.querySelectorAll(".selected")]
+    .map((_, i) => i);
+
+  if (!selectedPages.length) return alert("Select pages");
+
+  const newPdf = await PDFLib.PDFDocument.create();
+
+  const pagesArr = await newPdf.copyPages(doc, selectedPages);
+  pagesArr.forEach(p => newPdf.addPage(p));
+
+  const bytes = await newPdf.save();
+
+  const blob = new Blob([bytes], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "split.pdf";
+  a.click();
+}
+</script>
+
+</body>
+</html>

@@ -3,62 +3,91 @@
 <head>
 <meta charset="UTF-8">
 <title>Split PDF</title>
-
+<link rel="stylesheet" href="../style.css">
 <style>
 body {
   font-family: system-ui;
-  background: #0f172a;
+  background: #0b1220;
   color: white;
   padding: 20px;
 }
 
+/* DROPZONE */
 .dropzone {
   border: 2px dashed #475569;
-  padding: 30px;
+  padding: 40px;
   text-align: center;
-  border-radius: 12px;
+  border-radius: 14px;
   cursor: pointer;
-  background: #0b1220;
+  background: #0f172a;
+  transition: 0.2s;
 }
 
+.dropzone:hover {
+  border-color: #60a5fa;
+  background: #111827;
+}
+
+/* PAGE GRID (IMPORTANT CHANGE) */
+#pages {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+/* PAGE CARD */
 .page {
   background: #111827;
   padding: 10px;
-  margin-top: 10px;
-  border-radius: 8px;
+  border-radius: 14px;
   cursor: pointer;
+  transition: 0.2s;
+  border: 1px solid #1f2937;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+.page:hover {
+  transform: translateY(-4px);
+  border-color: #334155;
+}
+
+/* SELECTED STATE */
 .page.selected {
   border: 2px solid #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56,189,248,0.15);
 }
 
+/* CANVAS (BIG IMPROVEMENT) */
+.page canvas {
+  width: 100%;
+  border-radius: 10px;
+}
+
+/* PAGE LABEL */
+.page small {
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* BUTTON */
 button {
-  margin-top: 15px;
-  padding: 10px;
+  margin-top: 18px;
+  padding: 10px 14px;
   background: #2563eb;
   color: white;
   border: none;
-  border-radius: 8px;
-}
-.page {
-  background: #111827;
-  padding: 10px;
-  margin-top: 10px;
   border-radius: 10px;
   cursor: pointer;
-  display: inline-block;
-  width: 120px;
-  text-align: center;
+  transition: 0.2s;
 }
 
-.page canvas {
-  width: 100%;
-  border-radius: 6px;
+button:hover {
+  background: #1d4ed8;
 }
-
-
-
 </style>
 </head>
 

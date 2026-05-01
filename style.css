@@ -10,6 +10,7 @@
 body {
   background: #0f172a;
   color: white;
+  cursor: default;
 }
 
 /* TOP BAR */
@@ -50,4 +51,14 @@ iframe {
   width: 100%;
   height: 100%;
   border: none;
+}
+
+button,
+.card,
+.home-btn {
+  cursor: pointer;
+}
+/* iframe fix */
+iframe {
+  cursor: default;
 }

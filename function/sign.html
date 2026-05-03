@@ -43,6 +43,16 @@ button {
   color:white;
   cursor:pointer;
 }
+.sig {
+  position: absolute;
+  width: 120px;
+  cursor: move;
+  border: 2px dashed #38bdf8;
+  border-radius: 6px;
+}
+.viewer {
+  position: relative;
+}
 </style>
 </head>
 
@@ -55,6 +65,7 @@ button {
   <!-- LEFT -->
   <div class="left">
     <input type="file" id="file" accept="application/pdf">
+    <input type="file" id="sigUpload" accept="image/*">
 
     <p>Draw Signature:</p>
     <canvas id="sig" width="280" height="150"></canvas>
@@ -82,6 +93,7 @@ let drawing = false;
 let pdfBytes = null;
 let clickPos = null;
 let canvasPDF = null;
+let sigFile = null;
 
 // ✍️ DRAW SIGNATURE
 sig.onmousedown = e => {
@@ -144,27 +156,45 @@ document.getElementById("file").onchange = async e => {
   };
 };
 
+
+
+
 // 📤 EXPORT PDF
 async function exportPDF() {
 
   if (!pdfBytes) return alert("Upload PDF first");
-  if (!clickPos) return alert("Click on PDF to place signature");
+  if (!sigFile) return alert("Upload signature");
+  if (!sigImg) return alert("Place signature on PDF");
 
   const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
   const page = pdfDoc.getPages()[0];
 
-  const png = await pdfDoc.embedPng(sig.toDataURL());
+  const imgBytes = await sigFile.arrayBuffer();
+
+  let image;
+
+  if (sigFile.type === "image/png") {
+    image = await pdfDoc.embedPng(imgBytes);
+  } else if (sigFile.type === "image/jpeg") {
+    image = await pdfDoc.embedJpg(imgBytes);
+  } else {
+    return alert("Only PNG or JPG supported");
+  }
 
   const { width, height } = page.getSize();
 
-  const x = (clickPos.x / canvasPDF.width) * width;
-  const y = height - (clickPos.y / canvasPDF.height) * height;
+  const viewer = document.getElementById("viewer");
+  const viewerRect = viewer.getBoundingClientRect();
+  const sigRect = sigImg.getBoundingClientRect();
 
-  page.drawImage(png, {
+  const x = ((sigRect.left - viewerRect.left) / viewer.clientWidth) * width;
+  const y = height - ((sigRect.top - viewerRect.top + sigRect.height) / viewer.clientHeight) * height;
+
+  page.drawImage(image, {
     x,
     y,
-    width: 120,
-    height: 60
+    width: (sigRect.width / viewer.clientWidth) * width,
+    height: (sigRect.height / viewer.clientHeight) * height
   });
 
   const bytes = await pdfDoc.save();
@@ -179,6 +209,61 @@ async function exportPDF() {
   a.click();
   document.body.removeChild(a);
 }
+
+
+
+
+let sigImg = null;
+
+
+function enableDrag(el) {
+  let startX, startY;
+
+  el.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+
+    startX = e.clientX - el.offsetLeft;
+    startY = e.clientY - el.offsetTop;
+
+    function move(e) {
+      el.style.left = (e.clientX - startX) + "px";
+      el.style.top = (e.clientY - startY) + "px";
+    }
+
+    function stop() {
+      document.removeEventListener("mousemove", move);
+      document.removeEventListener("mouseup", stop);
+    }
+
+    document.addEventListener("mousemove", move);
+    document.addEventListener("mouseup", stop);
+  });
+}
+
+
+// upload signature image
+document.getElementById("sigUpload").onchange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  sigFile = file; // 🔥 STORE REAL FILE
+
+  const url = URL.createObjectURL(file);
+
+  if (sigImg) sigImg.remove();
+
+  sigImg = document.createElement("img");
+  sigImg.src = url;
+  sigImg.className = "sig";
+
+  sigImg.style.top = "20px";
+  sigImg.style.left = "20px";
+
+  document.getElementById("viewer").appendChild(sigImg);
+
+  enableDrag(sigImg);
+};
+console.log(sigFile.type);
 </script>
 
 </body>

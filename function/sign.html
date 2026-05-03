@@ -3,94 +3,171 @@
 <head>
 <meta charset="UTF-8">
 <title>Sign PDF</title>
-<link rel="stylesheet" href="../style.css">
+
 <style>
 body {
-  font-family: system-ui;
-  background: #0f172a;
-  color: white;
-  padding: 20px;
+  background:#0b1220;
+  color:white;
+  font-family:sans-serif;
+  padding:20px;
 }
 
+h2 { margin-bottom:10px; }
+
 canvas {
-  background: white;
-  border-radius: 8px;
+  background:white;
+  border-radius:6px;
+  margin-top:10px;
+}
+
+/* layout */
+.wrap {
+  display:flex;
+  gap:20px;
+}
+
+.left {
+  width:300px;
+}
+
+.viewer {
+  flex:1;
 }
 
 button {
-  margin-top: 10px;
-  padding: 10px;
-  background: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 8px;
+  margin-top:10px;
+  padding:8px 12px;
+  border:none;
+  border-radius:6px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<h2>Sign PDF (basic)</h2>
+<h2>✍️ Sign PDF (Clean Build)</h2>
 
-<canvas id="canvas" width="400" height="200"></canvas>
+<div class="wrap">
 
-<br>
-<button onclick="clearCanvas()">Clear</button>
-<button onclick="exportPDF()">Export Signed PDF</button>
+  <!-- LEFT -->
+  <div class="left">
+    <input type="file" id="file" accept="application/pdf">
 
+    <p>Draw Signature:</p>
+    <canvas id="sig" width="280" height="150"></canvas>
 
+    <button onclick="clearSig()">Clear</button>
+    <button onclick="exportPDF()">Export PDF</button>
+  </div>
 
+  <!-- RIGHT -->
+  <div class="viewer" id="viewer"></div>
 
+</div>
 
-
-
-
-
-
-
-
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
 <script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+const sig = document.getElementById("sig");
+const ctx = sig.getContext("2d");
 
 let drawing = false;
+let pdfBytes = null;
+let clickPos = null;
+let canvasPDF = null;
 
-canvas.onmousedown = () => drawing = true;
-canvas.onmouseup = () => drawing = false;
-
-canvas.onmousemove = (e) => {
-  if (!drawing) return;
-
-  const rect = canvas.getBoundingClientRect();
-
-  ctx.fillStyle = "black";
-  ctx.fillRect(e.clientX - rect.left, e.clientY - rect.top, 2, 2);
+// ✍️ DRAW SIGNATURE
+sig.onmousedown = e => {
+  drawing = true;
+  ctx.beginPath();
+  ctx.moveTo(e.offsetX, e.offsetY);
 };
 
-function clearCanvas() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+sig.onmousemove = e => {
+  if (!drawing) return;
+  ctx.lineTo(e.offsetX, e.offsetY);
+  ctx.stroke();
+};
+
+sig.onmouseup = () => drawing = false;
+
+function clearSig(){
+  ctx.clearRect(0,0,sig.width,sig.height);
 }
 
+// 📄 LOAD PDF
+document.getElementById("file").onchange = async e => {
+  const file = e.target.files[0];
+  if (!file) return;
 
+  const original = await file.arrayBuffer();
+
+  // 🔥 CLONE (important fix)
+  pdfBytes = original.slice(0);
+  const renderBytes = original.slice(0);
+
+  const pdf = await pdfjsLib.getDocument({ data: renderBytes }).promise;
+  const page = await pdf.getPage(1);
+
+  const viewport = page.getViewport({ scale: 1 });
+
+  canvasPDF = document.createElement("canvas");
+  canvasPDF.width = viewport.width;
+  canvasPDF.height = viewport.height;
+
+  await page.render({
+    canvasContext: canvasPDF.getContext("2d"),
+    viewport
+  }).promise;
+
+  const viewer = document.getElementById("viewer");
+  viewer.innerHTML = "";
+  viewer.appendChild(canvasPDF);
+
+  // 📍 CLICK POSITION
+  canvasPDF.onclick = (e) => {
+    const rect = canvasPDF.getBoundingClientRect();
+
+    clickPos = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+
+    alert("Position selected");
+  };
+};
+
+// 📤 EXPORT PDF
 async function exportPDF() {
-  const { PDFDocument } = PDFLib;
 
-  const pdf = await PDFDocument.create();
+  if (!pdfBytes) return alert("Upload PDF first");
+  if (!clickPos) return alert("Click on PDF to place signature");
 
-  const page = pdf.addPage([600, 300]);
+  const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
+  const page = pdfDoc.getPages()[0];
 
-  const img = canvas.toDataURL("image/png");
-  const pngImage = await pdf.embedPng(img);
+  const png = await pdfDoc.embedPng(sig.toDataURL());
 
-  page.drawImage(pngImage, {
-    x: 50,
-    y: 50,
-    width: 200,
-    height: 100
+  const { width, height } = page.getSize();
+
+  const x = (clickPos.x / canvasPDF.width) * width;
+  const y = height - (clickPos.y / canvasPDF.height) * height;
+
+  page.drawImage(png, {
+    x,
+    y,
+    width: 120,
+    height: 60
   });
 
-  const bytes = await pdf.save();
+  const bytes = await pdfDoc.save();
 
   const blob = new Blob([bytes], { type: "application/pdf" });
   const url = URL.createObjectURL(blob);
@@ -98,7 +175,9 @@ async function exportPDF() {
   const a = document.createElement("a");
   a.href = url;
   a.download = "signed.pdf";
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
 }
 </script>
 
